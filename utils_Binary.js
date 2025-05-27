@@ -1,3 +1,4 @@
+//this is utils_Binary.js
 const fs = require('fs');
 
 //-------------------------------------------------2.Binary response HANDLER-------------------------
@@ -22,6 +23,20 @@ async function answerBinaryQuestions(page) {
       const questionTextElement = await questionElement.$('span[data-test-form-builder-radio-button-form-component__title]');
       const questionText = (await questionTextElement.textContent()).trim();
       console.log("Binary Question:", questionText);
+      // === Handle special hardcoded binary questions ===
+if (questionText.toLowerCase().includes('us citizen')) {
+  console.log('Auto-answering: US Citizen -> No');
+  const noInput = await questionElement.$('input[value="No"]');
+  if (noInput) await noInput.check();
+  continue; // Move to next question
+}
+if (questionText.toLowerCase().includes('immigration sponsorship')) {
+  console.log('Auto-answering: Immigration Sponsorship -> No');
+  const noInput = await questionElement.$('input[value="No"]');
+  if (noInput) await noInput.check();
+  continue; // Move to next question
+}
+
 
       let answer = binaryAnswersDatabase[questionText];
 

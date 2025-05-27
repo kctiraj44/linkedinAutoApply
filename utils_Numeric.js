@@ -1,3 +1,4 @@
+//This is utils_Numeric.js
 const fs = require('fs');
 const natural = require('natural');
 const { TfIdf, WordTokenizer, PorterStemmer } = natural;
@@ -55,22 +56,70 @@ function saveAnswer(question, answer) {
   fs.writeFileSync(answersFilePath, JSON.stringify(answersDatabase, null, 2), 'utf8');
 }
 
-async function handleNewQuestion(question) {
-  console.log(`No sufficiently similar question found for: "${question}". Please provide an answer.`);
-  const answer = await new Promise((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    rl.question(`Answer for "${question}": `, (input) => {
-      rl.close();
-      resolve(input.trim());
-    });
+// async function handleNewQuestion(question) {
+//   console.log(`No sufficiently similar question found for: "${question}". Please provide an answer.`);
+//   const answer = await new Promise((resolve) => {
+//     const rl = readline.createInterface({
+//       input: process.stdin,
+//       output: process.stdout
+//     });
+//     rl.question(`Answer for "${question}": `, (input) => {
+//       rl.close();
+//       resolve(input.trim());
+//     });
+//   });
+
+//   saveAnswer(question, answer);
+//   return answer;
+// }
+
+// async function handleNewQuestion(questionText) {
+//   if (questionText.toLowerCase().startsWith('how many years')) {
+//     console.log(`Auto-filling '${questionText}' with '6'`);
+//     const answer = '6';
+//     saveAnswer(questionText, answer);
+//     return answer;
+//   }
+
+//   const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+//   });
+
+//   return new Promise((resolve) => {
+//     rl.question(`Please provide an answer for: \"${questionText}\" `, (answer) => {
+//       saveAnswer(questionText, answer);
+//       rl.close();
+//       resolve(answer);
+//     });
+//   });
+// }
+
+async function handleNewQuestion(questionText) {
+  // If the question starts with "How many years", auto-fill 6
+  if (questionText.toLowerCase().startsWith('how many years')) {
+    console.log(`Auto-filling '${questionText}' with 6`);
+    const answer = '6';
+    saveAnswer(questionText, answer);  // Save into answersDatabase so next time it's fast
+    return answer;
+  }
+
+  // Otherwise, ask the user manually
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
   });
 
-  saveAnswer(question, answer);
-  return answer;
+  return new Promise((resolve) => {
+    rl.question(`Please provide an answer for: "${questionText}" `, (answer) => {
+      saveAnswer(questionText, answer);
+      rl.close();
+      resolve(answer);
+    });
+  });
 }
+
+
 
 // Function to calculate cosine similarity using TF-IDF, adjusted for specific keywords
 function calculateSimilarity(question1, question2) {
